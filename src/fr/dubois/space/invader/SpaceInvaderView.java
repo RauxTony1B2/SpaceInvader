@@ -2,19 +2,11 @@ package fr.dubois.space.invader;
 
 
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
-
-
-
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Typeface;
@@ -22,13 +14,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 
 public class SpaceInvaderView extends View {
-	
+
 	// Dimensions souhaitées
+
 	private static final int TARGET_HEIGHT = 800;
 	private static final int TARGET_WIDTH = 600;
 
@@ -52,9 +43,6 @@ public class SpaceInvaderView extends View {
 		init();
 	}
 
-
-	
-
 	void init(){
 		paint = new Paint();
 		paint.setStyle(Style.STROKE);
@@ -63,19 +51,25 @@ public class SpaceInvaderView extends View {
 		paint.setTextSize(36);
 		paint.setTextAlign(Paint.Align.CENTER);
 
-		Bitmap insecteBitmap=loadImage(R.drawable.coccinelle); 
+		text = "Texte";
+		
+
+		Bitmap insecteBitmap=loadImage(R.drawable.kame); 
 		insecte = new Insecte (insecteBitmap, 0, 0);
 		text = "SpaceInvader";
+		
+		this.update();
+
 
 	}
 
-	
     // Création de la méthode loadImage 
+
 	public Bitmap loadImage(int key) {
 		Resources r = this.getContext().getResources();
 		Drawable drawable= r.getDrawable(key); 
-		int y=drawable.getIntrinsicHeight();
-		int x=drawable.getIntrinsicWidth();
+		int x=drawable.getIntrinsicHeight();
+		int y=drawable.getIntrinsicWidth();
 		Bitmap bitmap = Bitmap.createBitmap(x, y, Bitmap.Config.ARGB_8888);
 		Canvas canvas = new Canvas(bitmap);
 		drawable.setBounds(0, 0, x, y);
@@ -84,11 +78,11 @@ public class SpaceInvaderView extends View {
 		return bitmap;
 	}
 
-/*	  private void initSpaceInvaderView() {
+	/*	  private void initSpaceInvaderView() {
 	        setFocusable(true);
 
 	        Resources r = this.getContext().getResources();
-	        
+
 	        resetTiles(4);
 	        loadTile(PERSO, r.getDrawable(R.drawable.perso));
 	  }*/
@@ -98,7 +92,6 @@ public class SpaceInvaderView extends View {
 		super.onDraw(canvas);
 		canvas.drawRGB(0, 0, 0);
 		canvas.drawRect(0, 0, TARGET_WIDTH-1, TARGET_HEIGHT-1, paint);
-		insecte.draw(canvas);
 		if (text != null){
 			canvas.drawText(text, canvas.getWidth()/2,canvas.getHeight()/2, paint);
 		}
@@ -126,4 +119,37 @@ public class SpaceInvaderView extends View {
 		this.setMeasuredDimension(x,y);
 	}
 
+
+
+	// mise en place du compte à rebours | animation des images
+	
+	public void update() {
+		// TODO Auto-generated method stub//
+		// Création de la méthode update pour mettre à jour les positions
+		mRedrawHandler.sleep(40);
+		
+		insecte.act();
+	}
+	
+	private RefreshHandler mRedrawHandler = new RefreshHandler();
+
+	class RefreshHandler extends Handler {
+	
+
+		@Override
+		public void handleMessage(Message msg) {
+			SpaceInvaderView.this.update();
+			SpaceInvaderView.this.invalidate();
+		}
+
+		public void sleep(long delayMillis) {
+			this.removeMessages(0);
+			sendMessageDelayed(obtainMessage(0), delayMillis);
+			
+		}
+	}
+
+	
+
+	
 }
